@@ -1,0 +1,77 @@
+# Delete all
+DELETE /tests
+
+# Create mapping
+PUT tests
+{
+    "settings" : {
+        "number_of_shards" : 1
+    },
+    "mappings" : {
+        "jenkins" : {
+            "properties" : {
+                "@timestamp" : { "type" : "date" },
+                "job_name" : { "type" : "keyword" },
+                "revision" : { "type" : "keyword" },
+                "build_id" : { "type" : "keyword" },
+                "class_name" : { "type" : "keyword" },
+                "job_duration" : { "type" : "float" },
+                "test_duration" : { "type" : "float" },
+                "error_details" : { "type" : "text" },
+                "error_stack_trace" : { "type" : "text" },
+                "failed_since" : { "type" : "date" },
+                "test_name": { "type" : "keyword" },
+                "skipped" : { "type" : "text" },
+                "skipped_message" : { "type" : "text" },
+                "status": { "type" : "keyword" },
+                "stderr" : { "type" : "text" },
+                "stdout" : { "type" : "text" },
+                "test_actions" : { "type" : "text" },
+                "type" : { "type" : "keyword" },
+                "namespace" : { "type" : "keyword" },
+                "category" : { "type" : "keyword" },
+                "brand" : { "type" : "keyword" },
+                "tags" : { "type" : "keyword" },
+                "source" : { "type" : "keyword" }
+            }
+        }
+    }
+}
+
+# Add fields to mapping
+PUT tests/_mapping/jenkins
+{
+  "properties": {
+    "status": { "type": "keyword" }
+  }
+}
+
+
+# Insert data
+POST tests/jenkins
+{
+  "job_name": "este es el trabajo 2",
+  "file": "/foo/faa",
+  "@timestamp": "2015-06-21"
+}
+
+# bulk insert
+POST /_bulk
+{ "index" : { "_index" : "tests", "_type" : "jenkins"} }
+{"job_name": "este es el trabajo 22","file": "/foo/faa","@timestamp": "2015-06-21"}
+{ "index" : { "_index" : "tests", "_type" : "jenkins"} }
+{"job_name": "este es el trabajo 22","file": "/foo/faa","@timestamp": "2015-06-21"}
+
+#or
+POST /tests/jenkins/_bulk
+{ "index" : {} }
+{"job_name": "este es el trabajo 22","file": "/foo/faa","@timestamp": "2015-06-21"}
+{ "index" : {} }
+{"job_name": "este es el trabajo 22","file": "/foo/faa","@timestamp": "2015-06-21"}
+
+#or with fixed id
+POST /tests/jenkins/_bulk
+{ "index" : { "_id": "17"} }
+{"job_name": "este es el trabajo 22","file": "/foo/faa","@timestamp": "2015-06-21"}
+{ "index" : { "_id": "18"} }
+{"job_name": "este es el trabajo 22","file": "/foo/faa","@timestamp": "2015-06-21"}

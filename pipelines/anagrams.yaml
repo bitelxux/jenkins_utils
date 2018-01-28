@@ -1,0 +1,14 @@
+node('master') {
+      
+    stage('Checkout') {
+        git url: "https://github.com/bitelxux/anagrams.git"
+    }
+    
+    stage('Build') {
+           sh "make clean && make"
+    }
+    
+    stage('Archive') {
+        archiveArtifacts artifacts: 'anagrams.pdf', fingerprint: true
+    }
+}
