@@ -75,3 +75,23 @@ POST /tests/jenkins/_bulk
 {"job_name": "este es el trabajo 22","file": "/foo/faa","@timestamp": "2015-06-21"}
 { "index" : { "_id": "18"} }
 {"job_name": "este es el trabajo 22","file": "/foo/faa","@timestamp": "2015-06-21"}
+
+# Query and DELETE
+
+GET /test/_search
+{
+  "query": {
+    "match": {
+      "namespace": "thenamespace"
+    }
+  }
+}
+
+POST test/_delete_by_query
+{
+  "query": {
+    "match": {
+      "namespace": "thenamespace"
+    }
+  }
+}
