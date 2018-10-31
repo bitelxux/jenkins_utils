@@ -35,7 +35,31 @@ PUT tests
                 "source" : { "type" : "keyword" }
             }
         }
-    }
+
+
+GET /test/integration/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        { "match": { "namespace": "cnn-test" } },
+        { "match": { "revision.keyword": "204588" } }
+      ]
+   }
+ }   
+}
+
+
+GET /test/integration/_delete_by_query
+{
+  "query": {
+    "bool": {
+      "must": [
+        { "match": { "namespace": "cnn-test" } },
+        { "match": { "revision.keyword": "204588" } }
+      ]
+   }
+ }   
 }
 
 # Add fields to mapping
@@ -92,6 +116,102 @@ POST test/_delete_by_query
   "query": {
     "match": {
       "namespace": "thenamespace"
+    }
+  }
+}
+
+GET /test/_search
+{
+  "query": {
+            "bool": {
+            	"must": [
+            	  { "match": { "source.keyword": "jenkins" } },
+            		{ "match": { "namespace.keyword": "anu" } },
+            		{ "match": { "revision.keyword": "183079" } },
+            		{ "match": { "build_id": "793" } }
+            	]
+            }
+    }
+}
+
+GET /test/integration/_delete_by_query
+{
+  "query": {
+            "bool": {
+            	"must": [
+            	  { "match": { "source.keyword": "jenkins" } },
+            		{ "match": { "namespace.keyword": "anu" } },
+            		{ "match": { "revision.keyword": "183079" } },
+            		{ "match": { "build_id": "793" } }
+            	]
+            }
+    }
+}
+
+# bulk insert
+POST /_bulk
+{ "index" : {"_index": "test", "_type": "integration"}}
+{"@timestamp": "2018/02/16 21:10:33", "job_name": "['frontend-dashboards']", "build_id": "30", "revision": "therevision", "source": "thesource", "type": "thetype", "category": "thecategory", "job_duration": "37460603.000000", "namespace": "thenamespace", "brand": "thebrand", "file": "nova-dashboard.TestBigNumber", "suite_duration": "2310.831000", "stdout": "License probe with version 9.trying to connect to selenium running on http://localhost:4444/wd/hubbrowserUrl http://172.29.1.6:80/.", "stderr": "", "class_name": "TestBigNumber", "test_name": "TestCase01.test01", "test_duration": "48.526000", "skipped": "False", "failed_since": "0", "error_stack_trace": "", "status": "Pass"}
+
+# Search
+GET /test/_search
+{
+  "query": {
+    "match": {
+      "tags": "cnn"
+    }
+  }
+}
+
+# Delete
+POST test/_delete_by_query
+{
+  "query": {
+    "match": {
+      "tags": "cnn"
+    }
+  }
+}
+
+# Add field
+PUT test/_mapping/integration
+{
+  "properties": {
+    "tags": { "type": "text" }
+  }
+}
+
+# get mapping
+GET /test/_mapping
+
+# Search by query
+GET /test/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        { "match": { "source":  "bamboo" }},
+        { "match": { "namespace.keyword": "bamboo-others" }},
+        { "range": { "job_duration": { "lte": 60000 }}}
+      ]
+    }
+  }
+}
+
+# Update by query
+POST test/_update_by_query
+{
+  "script": {
+    "inline": "ctx._source.job_duration = ctx._source.job_duration * 1000",
+    "lang": "painless"
+  },
+  "query": {
+    "bool": {
+      "must": [
+        { "match": { "source":  "bamboo" }},
+        { "match": { "namespace.keyword": "bamboo-dashboards" }},
+        { "range": { "job_duration": { "lte": 60000 }}}
+      ]
     }
   }
 }
